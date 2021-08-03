@@ -1,8 +1,16 @@
-import './App.css';
+import React from "react";
+import {ThemeProvider} from "@material-ui/core/styles";
+import Navbar from "./components/Navbar";
+import Theme from "./Theme";
+import Currency from "./sections/Currency";
+
 
 const App = () => {
   return (
-    <div>Hello world</div>
+    <ThemeProvider theme={Theme}>
+      <Navbar />
+    <Currency />
+    </ThemeProvider>
   )
 }
 
