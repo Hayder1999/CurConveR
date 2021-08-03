@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import axios from "axios";
+
+axios.defaults.baseURL = "http://api.exchangeratesapi.io/v1/";
+axios.defaults.params = {};
+axios.defaults.params["access_key"] = "c8d76018fa94820c7800ea3142e5a54d";
 
 ReactDOM.render(
   <React.StrictMode>
