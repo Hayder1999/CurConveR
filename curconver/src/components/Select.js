@@ -36,11 +36,11 @@ const useStyles = makeStyles((theme) => ({
 
 const Select = (props) => {
     const classes = useStyles();
-    const {options, selectedValue, onSelectChange} = props;
+    const {options, selectedValue, onSelectChange, disabled} = props;
     
     return (
         <ReactSelect data-testid="selectBox" options={options} className={classes.inputSelect} value={selectedValue} onChange={(value) => onSelectChange(value)} 
-        isSearchable components={{IndicatorSeparator: () => null}} />
+        isSearchable components={{IndicatorSeparator: () => null}} isDisabled={disabled}/>
     )
 }
 
