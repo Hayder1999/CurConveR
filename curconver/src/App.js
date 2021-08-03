@@ -4,7 +4,6 @@ import Navbar from "./components/Navbar";
 import Theme from "./Theme";
 import Currency from "./sections/Currency";
 
-
 const App = () => {
   return (
     <ThemeProvider theme={Theme}>
