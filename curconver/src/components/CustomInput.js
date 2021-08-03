@@ -76,7 +76,8 @@ const useStyles = makeStyles((theme) => ({
 
 const CustomInput = (props) => {
     const classes = useStyles();
-    const { label, options, selectedCurrency, onCurrencyChange, otherSelectedCurrency, amount, setAmount, setOtherAmount, conversionRate, disabled } = props;
+    const { label, options, selectedCurrency, onCurrencyChange, otherSelectedCurrency, amount, setAmount, 
+        setOtherAmount, conversionRate, disabled } = props;
     const [active, setActive] = useState(false);
     const [valid, setValid] = useState(true);
     const handleAmountChange = (event) => {
@@ -91,7 +92,7 @@ const CustomInput = (props) => {
             A.the input is empty
             B.the input only contains a decimal point
             C.the input only contains a minus symbol
-            D.the input contains B followed with C or vice-versa
+            D.the input contains B followed with C or vice versa
             */
             const unformatted = amount.toString().replace(/,/g, '');
             if (isNaN(unformatted) || unformatted === "") {
