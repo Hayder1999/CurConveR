@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-end-production
+spec:
+  selector:
+    matchLabels:
+      app: front-end-production
+  template:
+    metadata:
+      labels:
+        app: front-end-production
+    spec:
+      containers:
+        - image: converter.azurecr.io/front-end-production
+          name: front-end-production
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          ports:
+            - containerPort: 80
+              name: http
