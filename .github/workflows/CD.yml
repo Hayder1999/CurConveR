@@ -1,0 +1,72 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: AKS Deployment
+
+on:
+  push:
+    branches: [ main ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./curconver
+    env:
+      CI: false
+      REGISTRY_NAME: "converter"
+      CLUSTER_NAME: "Converter"
+      CLUSTER_RESOURCE_GROUP: "CurconveR"
+      NAMESPACE: "default"
+      APP_NAME: "front-end-production"
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+    - name: Azure Container Registry Login
+      uses: Azure/docker-login@v1
+      with:
+        login-server: ${{env.REGISTRY_NAME}}.azurecr.io
+        username: ${{ secrets.USERNAME_SECRET }}
+        password: ${{ secrets.PASSWORD_SECRET }}
+    - run: |
+        docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+          
+      # Set the context for Kubernetes
+    - name: Kubernetes set context
+      uses: Azure/k8s-set-context@v1.1
+      with:
+        # method setting the context
+        method: service-account
+        # Cluster Url
+        k8s-url: https://converter-dns-04196b94.hcp.westeurope.azmk8s.io:443
+        # Service account secret. Run kubectl get serviceaccounts <service-account-name> -o yaml and copy the service-account-secret-name. Copy the ouptut of kubectl get secret <service-account-secret-name> -o yaml
+        k8s-secret: ${{ secrets.CURCONVER_SECRET }}
+          
+      # Deploy app to AKS
+    - name: Kubernetes deploy
+      uses: azure/k8s-deploy@v1
+      with:
+        manifests: |
+          curconver/manifest_production/deployment.yml
+          curconver/manifest_production/cluster.yml
+          curconver/manifest_production/load_balancer.yml
+        images: |
+          ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+        namespace: ${{ env.NAMESPACE }}
